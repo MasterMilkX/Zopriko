@@ -1,0 +1,170 @@
+<html>
+  <head>
+    <title>Puzzle Maker</title>
+    <style>
+      #drawIMG{
+        display:none;
+      }
+      .saveBtn{
+        appearance: button;
+        -moz-appearance: button;
+        -webkit-appearance: button;
+        text-decoration: none; font: menu; color: ButtonText;
+        display: inline-block; padding: 4px 10px;
+      }
+    </style>
+  </head>
+  <body>
+    <center>
+      <img id="drawIMG">
+      <h1>Puzzle Maker</h1>
+      <canvas id="puzzle" style="border:1px solid black">
+        Cannot show canvas on this browser. Use Chrome you n00b!
+      </canvas>
+      <br>
+      <button onclick="setSteps()">Get Coords</button>
+      <a href="#" class="saveBtn" id="save" download="map.png" onclick="downloadIMG()">Save</a>
+      <br>
+      <form action="upload.php" method="post" enctype="multipart/form-data">
+        <table border="none">
+          <tr>
+            <td>Map img:</td>
+            <td><input type="file" name="fileToUpload" id="fileToUpload"></td>
+          </tr>
+          <tr>
+            <td>Map Coordinates</td>
+            <td><textarea id="coords" name="coords"></textarea></td>
+          </tr>
+          <tr>
+            <td colspan="2"><input type="submit" value="Upload Map" name="submit"></td>
+          </tr>
+        </table>
+      </form>
+    </center>
+    <script>
+      var canvas = document.getElementById("puzzle");
+      var ctx = canvas.getContext("2d");
+      canvas.width = 224;
+      canvas.height = 224;
+      
+      //background image
+      var bgReady = false;
+      var bgImage = new Image();
+      bgImage.onload = function(){ bgReady = true; };
+      bgImage.src = "bg2.png";
+      
+      //wall objects
+      var wallReady = false;
+      var wallPNG = new Image();
+      wallPNG.onload = function(){wallReady = true;};
+      wallPNG.src = "wall.png";
+      
+      //floor objects
+      var floorReady = false;
+      var floorPNG = new Image();
+      floorPNG.onload = function(){floorReady = true;};
+      floorPNG.src = "mapFloor.png";
+      
+      //floor objects
+      var fillReady = false;
+      var fillPNG = new Image();
+      fillPNG.onload = function(){fillReady = true;};
+      fillPNG.src = "mapFill.png";
+      
+      var map2 = [[0,0,0,0,0,0,0,0,0,0],
+                 [0,0,0,0,0,0,0,0,0,0],
+                 [0,0,0,0,0,0,0,0,0,0],
+                 [0,0,0,0,0,0,0,0,0,0],
+                 [0,0,0,0,0,0,0,0,0,0],
+                 [0,0,0,0,0,0,0,0,0,0],
+                 [0,0,0,0,0,0,0,0,0,0],
+                 [0,0,0,0,0,0,0,0,0,0],
+                 [0,0,0,0,0,0,0,0,0,0],
+                 [0,0,0,0,0,0,0,0,0,0],
+                 [0,0,0,0,0,0,0,0,0,0]];
+                 
+      var curMap = map2;
+      var steps = [];
+      
+      
+      function drawMap(){
+        for(var z = 0; z < curMap.length; z++){
+          for(var y = 0; y < curMap[z].length; y++){
+            if(curMap[z][y] == 1){
+              ctx.drawImage(wallPNG, y * 32, z * 32);
+            }else if(curMap[z][y] == 0){
+              ctx.drawImage(floorPNG, y * 32, z * 32);
+            }
+          }
+        }
+      }
+      function fillAll(){
+        for(var i = 0; i < steps.length; i++){
+          var cell = steps[i];
+          if(fillReady){
+            ctx.drawImage(fillPNG, cell[0] * 32, cell[1] * 32);
+          }
+        }
+      }
+      
+      function render(){
+        if(wallReady && floorReady){
+          drawMap();
+        }
+        fillAll();
+      }
+      
+      function main(){
+        requestAnimationFrame(main);
+        render();
+        canvas.addEventListener("click", paint, false);
+      }
+      main();
+      //editor method for painting on squares
+      function paint(ev){
+        var sf = canvas.width / (canvas.width / 32);
+        
+        var x = Math.floor(ev.offsetX / sf);  //for the cursor alignment 
+        var y = Math.floor(ev.offsetY / sf);  //for the cursor alignment 
+        
+        ctx.fillStyle = "#000000";
+        ctx.fillRect(x * sf, y * sf, sf, sf);
+        
+        steps.push([x, y]);
+      }
+      function showSteps(){
+        var list = "";
+        for(var i = 0; i < steps.length; i++){
+          list += "[" + steps[i] + "], ";
+        }
+        console.log(list);
+      }
+      function setSteps(){
+        var list = "";
+        for(var i = 0; i < steps.length; i++){
+          list += "[" + steps[i] + "], ";
+        }
+        document.getElementById('coords').value = list;
+      }
+      function saveIMG(){
+        var tempIMG = document.getElementById('drawIMG');
+        var e = document.getElementById('puzzle');
+        var dataURL = e.toDataURL('image/png');
+        
+        //set to fake image to save the fake image
+        tempIMG.width = tempIMG.height = e.width;
+        tempIMG.src = dataURL;
+      
+      }
+      
+      function downloadIMG(){
+        var button = document.getElementById('save');
+        saveIMG();
+        
+        var imgURL = document.getElementById('drawIMG').src;
+        button.href = imgURL;
+      }
+      
+    </script>
+  </body>
+</html>

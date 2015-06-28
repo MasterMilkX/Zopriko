@@ -1,0 +1,108 @@
+<html>
+  <head>
+    <title>Settings</title>
+    <style>
+      button{
+        width:100%;
+        height:10vh;
+      }
+      td{
+        text-align:center;
+      }
+    </style>
+  </head>
+  <body onload="load()">
+    <center>
+      <table width="50vh">
+        <tr>
+          <td colspan=2><h2><strong>SETTINGS</strong></h2></td>
+        </tr>
+        <tr>
+          <td>&nbsp;</td>
+        </tr>
+        <tr>
+          <td><strong>CONTROLS</strong></td>
+          <td>
+            <select name="controlType" id="controls" onchange="switchHands(this.value);">
+              <option value="arrows">Arrows</option>
+              <option value="WASD">WASD</option>
+            </select>
+          </td>
+        </tr>
+        <tr>
+          <td><strong>MAP</strong></td>
+          <td>Grid<input type="checkbox" id="grid"/></td>
+        </tr>
+        <tr>
+          <td>&nbsp;</td>
+        </tr>
+        <tr>
+          <td><button onclick="instructions()">HELP</button></td><td><button onclick="credits()">ABOUT</button></td>
+        </tr>
+        <tr>
+          <td>&nbsp;</td>
+        </tr>
+        <tr>
+          <td colspan="2"><button onclick="resetData()">Reset Data</button></td>
+        </tr>
+      </table>
+      
+      <script>
+        function load(){
+          if(localStorage.gridOn == "true"){
+            document.getElementById('grid').checked = true;
+            console.log("GOOD TO GO");
+          }else{
+            document.getElementById('grid').checked = false;
+            console.log("NO GO");
+          }
+        }
+        function instructions(){
+          var help = "Use the arrow keys or [WASD] to move" +
+          "\nUse [1-3] to activate an item in the inventory" + 
+          "\nGet to the stairs before the NPC reaches you but pick up moneys along the way!" +
+          "\nPress enter on the GAME OVER screen to restart";
+          alert(help);
+        }
+        function credits(){
+          var credit = "Game and programming by Milk Charity\nArt by Anton Ross\n\nVisit RogueCube.com for more games\n Rogue Cube 2015";
+          alert(credit);
+        }
+        function resetData(){
+          var clear = window.confirm("Are you sure you want to clear all of your saved data?\nYou will lose your highscores, bank money, skins, and hats\nYou cannot undo this!");
+          if(clear){
+            var empty = [];
+            localStorage.bankCash = 0;
+            bankCash = 0;
+            localStorage.myCash = 0;
+            wallet = 0;
+            localStorage.highScore = 0;
+            localStorage["myHats"] = JSON.stringify(empty);
+            localStorage["powerups"] = JSON.stringify(empty);
+            localStorage["mySkins"] = JSON.stringify(empty);
+            localStorage["bought"] = JSON.stringify(empty);
+            localStorage.myHat = "None";
+            localStorage.mySkin = "Default"
+            alert("DATA ERASED");
+          }
+        }
+        function switchHands(value){
+          localStorage.handPos = value;
+        }
+        function goToGrid(){
+          if(document.getElementById('grid').checked)
+            localStorage.gridOn = "true";
+          else
+            localStorage.gridOn = "false";
+        }
+        function main(){
+          requestAnimationFrame(main);
+          goToGrid();
+          
+          document.getElementById('controls').value = localStorage.handPos;
+        }
+        main();
+      </script>
+    </center>
+  </body>
+</html>

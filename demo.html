@@ -1,0 +1,41 @@
+<!DOCTYPE html PUBLIC " -//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmln="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>Zopriko</title>
+    <meta http-equiv="content-type" content="text/html ; charset=iso-8859-1" />
+    <link rel="stylesheet" type="text/css" href="styles.css">
+  </head>
+  <body>
+    <table>
+      <tr>
+        <td>ZOPRIKO v.1</td>
+        <td>
+          <select name="moveType" onchange="switchMove(this.value);">
+            <option value="tap">Tap</option>
+            <option value="hold">Hold</option>
+          </select>
+        </td>
+        <td>
+          <select name="controlType" onchange="switchHands(this.value);">
+            <option value="arrows">Arrows</option>
+            <option value="WASD">WASD</option>
+          </select>
+        </td>
+        <td><select name="mapType" onchange="newMap(this.value);">
+            <option value="rooms">Rooms</option>
+            <option value="random">Random</option>
+          </select></td>
+        <td></td>
+        <td><button onclick="createMap()">New Map</button></td>
+        <td><input type="checkbox" id="walls">Walls</td>
+        <td>X: <input type="text" id="x" size="4">
+            Y: <input type="text" id="y" size="4">
+            <button onclick="getPos()">Find Pos</button>
+        </td>
+      </tr>
+      <tr></tr>
+    </table>
+    <script src="game2.js"></script>
+  </body>
+</html>

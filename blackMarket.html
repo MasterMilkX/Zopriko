@@ -1,0 +1,209 @@
+<html>
+  <head>
+    <title>Black Market</title>
+    <style>
+      #item{
+        width:10vh;
+        height: auto;
+      }
+      td{
+        text-align:center;
+      }
+    </style>
+  </head>
+  <body onload="main()">
+    <center>
+      <h3 id="money">Money: $</h3>
+      <table style="border:0">
+      <tr><td colspan="10"><h2>HATS</h2></td></tr>
+      <tr>
+        <td><img src="items/hats/cheesehead.png" id="item"></td>
+        <td><img src="items/hats/fez.png" id="item"></td>
+        <td><img src="items/hats/finn.png" id="item"></td>
+        <td><img src="items/hats/helmet1.png" id="item"></td>
+        <td><img src="items/hats/iron man.png" id="item"></td>
+        <td><img src="items/hats/viking.png" id="item"></td>
+        <td><img src="items/hats/pharoah.png" id="item"></td>
+        <td><img src="items/hats/gentleman.png" id="item"></td>
+        <td><img src="items/hats/helmet3.png" id="item"></td>
+        <td><img src="items/hats/pirate.png" id="item"></td>
+      </tr>
+      <tr>
+        <td>$150</td>
+        <td>$200</td>
+        <td>$350</td>
+        <td>$250</td>
+        <td>$1000</td>
+        <td>$450</td>
+        <td>$600</td>
+        <td>$1000</td>
+        <td>$350</td>
+        <td>$500</td>
+      </tr>
+      <tr>
+        <td><button onclick="buyHat('CheeseHead', 150);" name="CheeseHead">Cheesehead</button></td>
+        <td><button onclick="buyHat('Fez', 200);" name="Fez">Fez</button></td>
+        <td><button onclick="buyHat('Finn Hat', 350);" name="Finn Hat">Finn</button></td>
+        <td><button onclick="buyHat('Helmet 1', 250);" name="Helmet 1">Helmet 1</button></td>
+        <td><button onclick="buyHat('Iron Man', 1000);" name="Iron Man">Iron Man</button></td>
+        <td><button onclick="buyHat('Viking', 450);" name="Viking">Viking</button></td>
+        <td><button onclick="buyHat('Pharoah', 600);" name="Pharoah">Pharoah</button></td>
+        <td><button onclick="buyHat('Gentleman', 1000);" name="Gentleman">Gentleman</button></td>
+        <td><button onclick="buyHat('Helmet 3', 350);" name="Helmet 3">Helmet 3</button></td>
+        <td><button onclick="buyHat('Pirate', 500);" name="Pirate">Pirate</button></td>
+      </tr>
+      <tr><td>&nbsp;</td></tr>
+      <tr><td>&nbsp;</td></tr>
+      <tr><td colspan="10"><h2>SKINS</h2></td></tr>
+      <tr>
+        <td><img src="entities/black.png" id="item"></td>
+        <td><img src="entities/orange.png" id="item"></td>
+        <td><img src="entities/green.png" id="item"></td>
+        <td><img src="entities/blue.png" id="item"></td>
+        <td><img src="entities/purple.png" id="item"></td>
+        <td><img src="entities/cow.png" id="item"></td>
+        <td><img src="entities/panda.png" id="item"></td>
+        <td><img src="entities/cat.png" id="item"></td>
+        <td><img src="entities/robot.png" id="item"></td>
+        <td><img src="entities/missingno.png" id="item"></td>
+      </tr>
+      <tr>
+        <td>$350</td>
+        <td>$350</td>
+        <td>$350</td>
+        <td>$350</td>
+        <td>$350</td>
+        <td>$450</td>
+        <td>$450</td>
+        <td>$450</td>
+        <td>$450</td>
+        <td>$750</td>
+      </tr>
+      <tr>
+        <td><button onclick="buySkin('Black Skin', 350);" name="Black Skin">Black</button></td>
+        <td><button onclick="buySkin('Orange Skin', 350);" name="Orange Skin">Orange</button></td>
+        <td><button onclick="buySkin('Green Skin', 350);" name="Green Skin">Green</button></td>
+        <td><button onclick="buySkin('Blue Skin', 350);" name="Blue Skin">Blue</button></td>
+        <td><button onclick="buySkin('Purple Skin', 350);" name="Purple Skin">Purple</button></td>
+        <td><button onclick="buySkin('Cow Skin', 450);" name="Cow Skin">Cow</button></td>
+        <td><button onclick="buySkin('Panda Skin', 450);" name="Panda Skin">Panda</button></td>
+        <td><button onclick="buySkin('Cat Skin', 450);" name="Cat Skin">Cat</button></td>
+        <td><button onclick="buySkin('Robot Skin', 450);" name="Robot Skin">Robot</button></td>
+        <td><button onclick="buySkin('Missingno Skin', 450);" name="Missingno Skin">Missingno</button></td>
+      </tr>
+    </table>
+    </center>
+    <script>
+      var money = 0;
+      var hats = [];
+      var skins = [];
+      var disabledBtns = [];
+      var powerups = [];
+      
+        
+      function load(){
+        if(typeof(Storage) !== "undefined"){
+          if(localStorage["myHats"])
+            hats = JSON.parse(localStorage["myHats"]);
+          else 
+            localStorage["myHats"] = JSON.stringify(hats);
+            
+          if(localStorage["powerups"])
+            powerups = JSON.parse(localStorage["myHats"]);
+          else 
+            localStorage["powerups"] = JSON.stringify(powerups);
+            
+          if(localStorage["mySkins"])
+            skins = JSON.parse(localStorage["mySkins"]);
+          else
+            localStorage["mySkins"] = JSON.stringify(skins);
+    
+          if(localStorage.setCash)
+            money = localStorage.setCash;
+          else
+            money = 0;
+            
+          if(localStorage["bought"])
+            disabledBtns = JSON.parse(localStorage["bought"]);
+          else
+            localStorage["bought"] = JSON.stringify(disabledBtns);
+          
+        }
+      }
+      load();
+      
+      function buyHat(item, price){
+        if(!hasHat(item)){
+          if(price <= money){
+            hats.push(item);
+            money -= price;
+            localStorage.myCash -= price;
+            alert(item + " get!");
+            disabledBtns.push(this.name);
+          }
+          else
+            alert("You can't afford to buy the " + item);
+        }
+        else{
+          alert(item + " already in inventory!");
+        }
+      }
+      function buySkin(item, price){
+        if(!hasSkin(item)){
+          if(price <= money){
+            skins.push(item);
+            money -= price;
+            localStorage.myCash -= price;
+            alert(item + " get!");
+            disabledBtns.push(this.name);
+          }
+          else
+            alert("You can't afford to buy the " + item);
+        }else{
+          alert(item + " already in inventory!");
+        }
+      }
+      function hasHat(item){
+        for(var a = 0; a < hats.length; a++){
+          if(hats[a] == item){
+            return true;
+          }
+        }
+        return false;
+      }
+      function hasSkin(item){
+        for(var a = 0; a < skins.length; a++){
+          if(skins[a] == item){
+            return true;
+          }
+        }
+        return false;
+      }
+      function main(){
+        document.getElementById('money').innerHTML = "Money: $" + money;
+        localStorage["myHats"] = JSON.stringify(hats);
+        localStorage["bought"] = JSON.stringify(disabledBtns);
+        localStorage["powerups"] = JSON.stringify(powerups);
+        localStorage["mySkins"] = JSON.stringify(skins);
+        localStorage.inStore = "true";
+        requestAnimationFrame(main);
+      }
+      function returnList(list){
+        var total = "";
+        for(var a = 0; a < list.length; a++){
+          total += list[a] + ", ";
+        }
+        return total;
+      }
+      function disable(){
+        for(var i = 0; i < disabledBtns.length; i++){
+          document.getElementsByName(disabledBtns[i]).disabled = true;
+        }
+      }
+      function check(){
+        console.log();
+      }
+      main();
+    </script>
+  </body>
+</html>

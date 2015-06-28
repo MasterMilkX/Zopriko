@@ -1,0 +1,17 @@
+<html>
+  <head>
+    <title>
+      Import JS Test
+    </title>
+  </head>
+  <body>
+    <h1>Import JS Test</h1>
+    <script src="customizables.js"></script>
+    <script>
+      for(var a = 0; a < gameSkins.length; a++)
+        document.write("<p>" + gameSkins[a].screenName + ", " + gameSkins[a].price + " <img src=" + gameSkins[a].src + ">" +"</p>")
+      for(var a = 0; a < gameHats.length; a++)
+        document.write("<p>" + gameHats[a].screenName + ", " + gameHats[a].price + " <img src=" + gameHats[a].src + ">" +"</p>")
+    </script>
+  </body>
+</html>

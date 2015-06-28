@@ -1,0 +1,290 @@
+<!DOCTYPE html PUBLIC " -//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmln="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>Path Find Test 2</title>
+    <meta http-equiv="content-type" content="text/html ; charset=iso-8859-1" />
+  </head>
+  <body>
+    <h1>Path Finding Test 2</h1><button onclick="findArea()">NEXT</button><button onclick="test()">test</button><br><br>
+    <script>
+      //set up the canvas
+      var canvas = document.createElement("canvas");
+      var ctx = canvas.getContext("2d");
+      
+      
+      //background image
+      var bgReady = false;
+      var bgImage = new Image();
+      bgImage.onload = function(){ bgReady = true; };
+      bgImage.src = "bg2.png";
+      
+      //wall objects
+      var wallReady = false;
+      var wallPNG = new Image();
+      wallPNG.onload = function(){wallReady = true;};
+      wallPNG.src = "wall.png";
+      
+      //floor objects
+      var floorReady = false;
+      var floorPNG = new Image();
+      floorPNG.onload = function(){floorReady = true;};
+      floorPNG.src = "floor2.png";
+      
+      //floor objects
+      var fillReady = false;
+      var fillPNG = new Image();
+      fillPNG.onload = function(){fillReady = true;};
+      fillPNG.src = "fill.png";
+      
+      //game objects
+      var player = {
+        x : 5, 
+        y : 1
+      };
+      var playerReady = false;
+      var playerPNG = new Image();
+      playerPNG.onload = function(){playerReady = true;};
+      playerPNG.src = "player.png";
+      
+      var npc = {
+        x : 3, 
+        y : 5
+      };
+      var npcReady = false;
+      var npcPNG = new Image();
+      npcPNG.onload = function(){npcReady = true;};
+      npcPNG.src = "npc.png";
+      
+      //preset map
+      var map = [[1,1,1,1,1,1,1,1,1],
+                 [1,0,0,0,0,0,0,0,1],
+                 [1,1,1,0,0,1,1,1,1],
+                 [1,0,0,0,0,0,0,0,1],
+                 [1,0,0,1,1,0,0,0,1],
+                 [1,0,0,0,0,0,0,0,1],
+                 [1,1,1,1,1,1,1,1,1]];
+      var map2 = [[0,0,0,0,0,0,0],
+                 [0,0,0,0,0,0,0],
+                 [0,0,0,0,0,0,0],
+                 [0,0,0,0,0,0,0],
+                 [0,0,0,0,0,0,0],
+                 [0,0,0,0,0,0,0],
+                 [0,0,0,0,0,0,0]];
+      var map3 = [[0,0,0,0,0,0,0],
+                 [0,0,0,0,0,0,0],
+                 [0,0,0,1,1,1,1],
+                 [0,0,0,0,0,0,0],
+                 [0,0,0,0,0,0,0],
+                 [0,0,0,0,0,0,0],
+                 [0,0,0,0,0,0,0]];
+      var map4 = [[1,1,1,1,1,1,1,1,1],
+                 [1,0,0,0,0,0,0,0,1],
+                 [1,1,1,0,0,1,1,1,1],
+                 [1,0,0,1,1,0,0,0,1],
+                 [1,0,0,1,1,0,0,0,1],
+                 [1,0,0,0,0,0,0,0,1],
+                 [1,1,1,1,1,1,1,1,1]];
+      var map5 = [[1,1,1,1,1,1,1,1,1,1,1,1],
+                  [1,0,0,0,0,0,0,0,0,0,0,1],
+                  [1,1,1,0,0,1,1,1,1,1,0,1],
+                  [1,0,0,1,1,0,0,0,0,0,0,1],
+                  [1,0,0,1,1,0,0,0,1,1,1,1],
+                  [1,0,0,0,0,0,0,0,1,1,1,1],
+                  [1,1,1,1,1,1,1,1,1,1,1,1]];
+      
+      var curMap = map5;
+      
+      canvas.width = curMap[0].length * 32;
+      canvas.height = curMap.length * 32;
+      document.body.appendChild(canvas);
+      
+      function drawMap(){
+        for(var z = 0; z < curMap.length; z++){
+          for(var y = 0; y < curMap[z].length; y++){
+            if(curMap[z][y] == 1){
+              ctx.drawImage(wallPNG, y * 32, z * 32);
+            }else if(curMap[z][y] == 0){
+              ctx.drawImage(floorPNG, y * 32, z * 32);
+            }
+          }
+        }
+      }
+      
+      function render(){
+        if(wallReady && floorReady){
+          drawMap();
+        }
+        fillAll();
+        if(playerReady){
+          ctx.drawImage(playerPNG, player.x * 32, player.y * 32);
+        }
+        if(npcReady){
+          ctx.drawImage(npcPNG, npc.x * 32, npc.y * 32);
+        }
+        
+      }
+      
+      var frontier = [];
+      var start = [npc.x, npc.y];
+      frontier.push(start);
+      var closedCells = [];
+      closedCells.push(start);
+      var index = 0;
+      
+      var parents = [];
+      
+      
+      function test(){
+        var playerPos = [player.x, player.y];
+        var npcPos = [npc.x, npc.y];
+        var current = playerPos;
+        
+        frontier = [];
+        start = [npc.x, npc.y];
+        frontier.push(start);
+        closedCells = [];
+        closedCells.push(start);
+        index = 0;
+        
+        parents = [];
+        while(index < frontier.length){
+          findArea();
+        }
+        var enemyPath = findPath(npcPos, playerPos);
+        if(!arrEq(enemyPath[0], [-1,-1])){
+          npc.x = enemyPath[enemyPath.length - 1][0];
+          npc.y = enemyPath[enemyPath.length - 1][1];
+        }else{
+          console.log("Unreachable");
+        }
+      }
+      function findPath(start, end){
+        var path = []
+        if(inClosedCells(end)){
+          while(!arrEq(end, start)){
+            path.push(end);
+            end = findParents(end);
+          }
+          return path;
+        }
+        return [[-1,-1]];
+      }
+      function findParents(child){
+        for(var y = 0; y < parents.length; y++){
+          var dad = parents[y][0];
+          var kid = parents[y][1];
+          if(arrEq(kid, child)){
+            return dad;
+          }
+        }
+        return [-1,-1];
+      }
+      
+      function findArea(){
+        if(index < frontier.length){
+          var neighbors = getNeighbors(frontier[index]);
+          
+          var prtOut = "Rank: " + index + "\tPos: " + frontier[index] + "\tSpawn: ";
+          for(var o = 0; o < neighbors.length; o++){
+            prtOut += neighbors[o] + " ";
+          }
+          
+          var pInd = 0;
+          for(var t = 0; t < neighbors.length; t++){
+            if(!inClosedCells(neighbors[t])){
+              closedCells.push(neighbors[t]);
+              frontier.push(neighbors[t]);
+              //prtOut += neighbors[t] + " ";
+              if(!inParents(neighbors[t])){
+                var family = [frontier[index], neighbors[t]];     //parent then child
+                parents.push(family);
+                //console.log(parents[pInd][0] + ", " + parents[pInd][1]);
+                pInd++;
+              }
+            }
+            
+          }
+          console.log(prtOut);
+          
+          index++;
+        }else{
+          console.log("all done :P");
+        }
+      }
+      function getNeighbors(pos){
+        var neighbor = [];
+        var north = [pos[0], pos[1]-1];
+        var east = [pos[0]+1, pos[1]];
+        var south = [pos[0], pos[1]+1];
+        var west = [pos[0]-1, pos[1]];
+        if(((pos[1] - 1) >= 0) && (curMap[pos[1] -1][pos[0]] != 1))
+          neighbor.push(north);
+        if(((pos[0] - 1) >= 0) && (curMap[pos[1]][pos[0] - 1] != 1))
+          neighbor.push(west);
+        if(((pos[1] + 1) < curMap.length) && (curMap[pos[1] +1][pos[0]] != 1))
+          neighbor.push(south);
+        if(((pos[0] + 1) < curMap[0].length) && (curMap[pos[1]][pos[0] + 1] != 1))
+          neighbor.push(east);
+        
+        return neighbor;
+      }
+      
+      function inClosedCells(pos){
+        for(var v = 0; v < closedCells.length; v++){
+          if(arrEq(pos, closedCells[v]))
+            return true;
+        }
+        return false;
+      }
+      function inParents(pos){
+        for(var v = 0; v < parents.length; v++){
+          for(var o = 0; o < parents[v].length; o++){
+            if(arrEq(pos, parents[v][o]))
+              return true;
+          }
+        }
+        return false;
+      }
+      
+      function arrEq(arr1, arr2){
+        for(var p = 0; p < arr1.length; p++){
+          if(arr1[p] !== arr2[p])
+            return false
+        }
+        return true;
+      }
+      
+      function fillAll(){
+        for(var i = 0; i < closedCells.length; i++){
+          var cell = closedCells[i];
+          if(fillReady){
+            ctx.drawImage(fillPNG, cell[0] * 32, cell[1] * 32);
+          }
+        }
+      }
+      
+      
+      //main game loop
+      function main(){
+        var now = Date.now();
+        var delta = now - then;
+        //update(delta / 1000);
+        render();
+        then = now;
+        //repeat again asap
+        requestAnimationFrame(main);
+        canvas.focus();
+      }
+      
+      //cross browser support for updating animation frames
+      var w = window;
+      requestAnimationFrame = w.requestAnimationFrame || w.webkitRequestAnimationFrame || w.msRequestAnimationFrame || w.mozRequestAnimationFrame;
+      
+      //LETS PLAY!
+      var then = Date.now(); 
+      main();
+      
+    </script>
+  </body>
+</html>

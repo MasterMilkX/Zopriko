@@ -1,0 +1,190 @@
+<html>
+  <head>
+    <title>Bank</title>
+    <style>
+      #chest{
+        width: 40vh;
+        height:auto;
+      }
+      #walletAmt, #bankAmt{
+        color:#03A100;
+      }
+      .number{
+        width:10vh;
+        height:10vh;
+      }
+      .options{
+        width:20vh;
+        height:auto;
+        font-size:80%;
+      }
+      .center{
+        text-align:center;
+      }
+    </style>
+  </head>
+  <body onload="load()">
+    <center>
+      <table>
+        <tr>
+          <td colspan="4"><h2 class="center">Bank</h2></td>
+        </tr>
+        <tr>
+          <td colspan=4 class="center">
+            <button style="width:15vh;height:auto;background-color:blue;font-size:75%" onclick="helpMe();">HELP</button>&nbsp;
+            <button class="options" onclick="newMode('withdraw');">Withdraw</button>
+            <button class="options" onclick="newMode('deposit');">Deposit</button>
+            <button class="options" onclick="window.close();" style="background-color:red">Exit</button>
+          </td>
+        </tr>
+        <tr>
+          <td rowspan="3" class="center">
+            <img src="items/items3/chest.png" id="chest">
+          </td>
+          <td class="center"><button class="number" onclick="add(1);">1</button></td>
+          <td class="center"><button class="number" onclick="add(2);">2</button></td>
+          <td class="center"><button class="number" onclick="add(3);">3</button></td>
+        </tr>
+        <tr>
+          <td class="center"><button class="number" onclick="add(4);">4</button></td>
+          <td class="center"><button class="number" onclick="add(5);">5</button></td>
+          <td class="center"><button class="number" onclick="add(6);">6</button></td>
+        </tr>
+        <tr>
+          <td class="center"><button class="number" onclick="add(7);">7</button></td>
+          <td class="center"><button class="number" onclick="add(8);">8</button></td>
+          <td class="center"><button class="number" onclick="add(9);">9</button></td>
+        </tr>
+        <tr>
+          <td class="center" ><button onclick="allMoneys()">ALL</button>&nbsp;<input type="number" value="0" id="inputAmt" min="0" max="1000000000000" readonly="true"></td>
+          <td class="center"><button class="number" style="background-color:#00ff00" onclick="enterAmt();">&#10004;</button></td>
+          <td class="center"><button class="number" onclick="add(0);">0</button></td>
+          <td class="center"><button class="number" style="background-color:#ff0000" onclick="clearInput();">&#10006;</button></td>
+        </tr>
+        <tr>
+          <td colspan="1" class="center">
+            <h3 id="walletAmt">Wallet: $ </h3>
+          </td>
+          <td colspan="3" class="center">
+            <h3 id="bankAmt">Bank: $ </h3>
+          </td>
+        </tr>
+      </table>
+    </center>
+    <script>
+      var mode = "select"
+      var bankCash;
+      var wallet;
+      
+      function load(){
+        if(typeof(Storage) !== "undefined"){
+          if(localStorage.bankCash)
+            bankCash = parseInt(localStorage.bankCash);
+          else{
+            bankCash = 0;
+            localStorage.bankCash = parseInt(bankCash);
+          }
+          
+          if(localStorage.myCash)
+            wallet = parseInt(localStorage.myCash);
+          else{
+            wallet = 0;
+            localStorage.myCash = parseInt(wallet);
+          }
+        }
+      }
+      function add(num){
+        document.getElementById('inputAmt').value += num;
+      }
+      function clearInput(){
+        var val = document.getElementById('inputAmt').value;
+        if(val == ""){
+          mode = "select";
+        }else{
+          document.getElementById('inputAmt').value = "";
+        }
+      }
+      function newMode(type){
+        mode = type;
+      }
+      function enterAmt(){
+        var amt = document.getElementById('inputAmt').value;
+        console.log(amt);
+        if(mode == "withdraw"){
+          if(amt > bankCash){
+            alert("Not enough money to take out this amount");
+          }else if(amt == null || amt == "" || amt % 1 !== 0 || isNaN(amt)){
+            alert("Enter an amount!");
+          }else{
+            wallet += parseInt(amt);
+            bankCash -= parseInt(amt);
+            mode = "select";
+          }
+        }else if(mode == "deposit"){
+          if(amt > wallet){
+            alert("Not enough money to save this amount");
+          }else if(amt == null || amt == "" || amt % 1 !== 0 || isNaN(amt)){
+            alert("Enter an amount!");
+          }else{
+            wallet -= parseInt(amt);
+            bankCash += parseInt(amt);
+            mode = "select";
+          }
+        }
+        document.getElementById('inputAmt').value = "0";
+        localStorage.bankCash = bankCash;
+        localStorage.myCash = wallet;
+      }
+      function helpMe(){
+        alert("1. Click on the modes above: Withdraw, Deposit, or Exit" +
+            "\n2. Enter an amount by clicking on the number buttons" + 
+            "\n3. Click the green check to take out the amount or the red X to clear the amount" +
+            "\n4. Click the red x again to exit the mode");
+      }
+      function allMoneys(){
+        if(mode == "withdraw")
+          document.getElementById('inputAmt').value = bankCash;
+        else if(mode == "deposit")
+          document.getElementById('inputAmt').value = wallet;
+      }
+      
+      function main(){
+        if(mode == "select")
+          disableBtns("number");
+        else
+          disableBtns("options");
+        
+        document.getElementById('walletAmt').innerHTML = "Wallet: $" + localStorage.myCash;
+        document.getElementById('bankAmt').innerHTML = "Bank: $" + localStorage.bankCash;
+        
+        requestAnimationFrame(main);
+        
+        makeNumber(localStorage.bankCash);
+        makeNumber(localStorage.myCash);
+      }
+      function makeNumber(v){
+        if(typeof(v) != "number"){
+          v = parseInt(v);
+          return false;
+        }
+        return true;
+      }
+      
+      function disableBtns(type){
+        var normBtns = document.getElementsByTagName('button');
+        for(var i = 0; i < normBtns.length; i++){
+          normBtns[i].disabled = false;
+        }
+        var btns = document.getElementsByClassName(type);
+        for(var i = 0; i < btns.length; i++){
+          btns[i].disabled = true;
+        }
+      }
+      window.onunload = function(){
+        return "Closing Bank";
+      }
+      
+      main();
+    </script>
+  </body>
+</html>

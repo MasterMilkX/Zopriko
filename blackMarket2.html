@@ -1,0 +1,474 @@
+<html>
+  <head>
+    <title>Black Market</title>
+    <style>
+      body{
+        background-color:#000000;
+      }
+      #container{
+        width:1075px;
+        height:100%;
+        background-color:#121212;
+      }
+      .type{
+        background-color:#0000ff;
+        width:300px;
+        float:left;
+        margin-left:1%;
+        margin-right:1%;
+        margin-top:2%;
+      }
+      .example{
+        width:15%;
+        height:auto;
+      }
+      .selection{
+        background-color:#ffffff;
+        width:250px;
+        margin:auto;
+        border-spacing:0px;
+        padding-top:10px;
+        padding-bottom:10px;
+      }
+      .section{
+        height:150px;
+        overflow-y:scroll;
+        overflow-x:hidden;
+        margin-right:25px;
+        margin-left:25px;
+        background-color:#ffffff;
+      }
+      .selection td{
+        background-color:#ffffff
+        border-right:0px;
+        border-left:0px;
+        border-bottom:5px solid white !important;
+      }
+      .selection tr:hover{
+        background-color:#ffff00;
+      }
+      .icon{
+        width:100%;
+        margin-left:auto;
+        margin-right:auto;
+        padding-left:5px;
+      }
+      .descr{
+        width:100px;
+        padding-left:15px;
+        font-size:90%;
+      }
+      .price{
+        width:75px;
+        padding-left:15px;
+      }
+    </style>
+  </head>
+  <body onload="start();">
+    <center>
+      <div id="container">
+        <table style="width:90%">
+          <td style="width:25%;color:white">&nbsp;</td>
+          <td style="width:30%;text-align:center;color:white"><h1>Black Market</h1></td>
+          <td style="width:25%;color:white;"><h2 id="money" style='text-align:right;'>Money: $0</h2></td>
+        </table>
+        <div class="type" style="margin-left:6%">
+          <img src="items/hats/magic.png" class="example">
+          &nbsp;
+          <div class="section">
+            <table class="selection" id="hats">
+            </table>
+          </div>
+          &nbsp;
+          &nbsp;
+        </div>
+        <div class="type">
+          <img src="entities/player.png" class="example">
+          &nbsp;
+          <div class="section">
+            <table class="selection" id="skins">
+            </table>
+          </div>
+          
+          &nbsp;
+          &nbsp;
+        </div>
+        <div class="type">
+          <img src="items/ICE_arm1_red.png" class="example">
+          &nbsp;
+          <div class="section">
+            <table class="selection" id="normal_items">
+            </table>
+          </div>
+          
+          &nbsp;
+        </div>
+        <div class="type" style="margin-left:20%">
+          <img src="items/items2/Coin_Gold.png" class="example">
+          &nbsp;
+          <div class="section">
+            <table class="selection" id="special_items">
+            </table>
+          </div>
+          
+          &nbsp;
+          &nbsp;
+        </div>
+        <div class="type">
+          <img src="puzzles/maps/map_k.png" class="example">
+          &nbsp;
+          <div class="section">
+            <table class="selection" id="maps">
+            </table>
+          </div>
+          
+          &nbsp;
+          &nbsp;
+        </div>
+      </div>
+      <script src="customizables.js"></script>
+      <script>
+        var storeHats = [];
+        var storeSkins = [];
+        var storeMaps = [];
+        for(var q = 0; q < gameHats.length; q++){
+          if(gameHats[q].price > 1){
+            storeHats.push(gameHats[q]);
+          }
+        }
+        for(var w = 0; w < gameSkins.length; w++){
+          if(gameSkins[w].price > 1){
+            storeSkins.push(gameSkins[w]);
+          }
+        }
+        for(var y = 0; y < gameMaps.length; y++){
+          storeMaps.push(gameMaps[y]);
+        }
+        
+        var normalItems = ["Bomb", "Water Bucket", "Spoon", "Radioactive Waste"];
+        var specialItems = ["Life Saver", "Money Multiplier"];
+        
+        
+        var myMaps = [];
+        var myHats = [];
+        var mySkins = [];
+        var cart = [];
+        var cartMax = 3;
+        var gameInventory = [];
+        var money = 1000;
+        var lives = 1;
+        
+        var hatsIndex = 0;
+        
+        function load(){
+          if(typeof(Storage) !== "undefined"){
+            if(localStorage["myHats"]){
+              myHats = JSON.parse(localStorage["myHats"]);
+            }else 
+              myHats = [];
+              
+            if(localStorage["mySkins"])
+              mySkins = JSON.parse(localStorage["mySkins"]);
+            else
+              mySkins = [];
+              
+            if(localStorage["myMaps"])
+              myMaps = JSON.parse(localStorage["myMaps"]);
+            else
+              localStorage["myMaps"] = JSON.stringify(myMaps);
+      
+            if(localStorage.setCash)
+              money = localStorage.setCash;
+            else
+              money = 0;
+            
+            if(localStorage["inventory"])
+              gameInventory = JSON.parse(localStorage["inventory"]);
+            else
+              gameInventory = ["--", "--", "--"];
+              
+            cartMax = getInventSpace();
+            
+            if(localStorage.lives)
+              lives = Number(localStorage.lives);
+            else
+              lives = 1;
+            
+          }
+        }
+        
+        function addHats(){
+          var table = document.getElementById('hats');
+          var newSet = getAvailable(storeHats, myHats);
+          for(var d = 0; d < newSet.length; d++){
+            var row = table.insertRow(d);
+            row.id = newSet[d];
+            var imgCell = row.insertCell(0);
+            var descrCell = row.insertCell(1);
+            var priceCell = row.insertCell(2);
+            var img = document.createElement('img');
+            img.className = "icon";
+            img.src = newSet[d].src;
+            imgCell.appendChild(img);
+            descrCell.innerHTML = newSet[d].screenName;
+            descrCell.className = "descr"
+            priceCell.innerHTML = "$" + newSet[d].price;
+            priceCell.className = "price";
+            row.onclick = function(){ buyItem(this, myHats, 'hats');};
+          }
+        }
+        function addSkins(){
+          var table = document.getElementById('skins');
+          var newSet = getAvailable(storeSkins, mySkins);
+          for(var d = 0; d < newSet.length; d++){
+            var row = table.insertRow(d);
+            row.id = newSet[d];
+            var imgCell = row.insertCell(0);
+            var descrCell = row.insertCell(1);
+            var priceCell = row.insertCell(2);
+            var img = document.createElement('img');
+            img.className = "icon";
+            img.src = newSet[d].src;
+            imgCell.appendChild(img);
+            descrCell.innerHTML = newSet[d].name;
+            descrCell.className = "descr"
+            priceCell.innerHTML = "$" + newSet[d].price;
+            priceCell.className = "price";
+            row.onclick = function(){ buyItem(this, mySkins, 'skins');};
+          }
+        }
+        function addNormalItems(){
+          var table = document.getElementById('normal_items');
+          for(var d = 0; d < normalItems.length; d++){
+            var row = table.insertRow(d);
+            row.id = normalItems[d];
+            var imgCell = row.insertCell(0);
+            var descrCell = row.insertCell(1);
+            var priceCell = row.insertCell(2);
+            var img = document.createElement('img');
+            img.className = "icon";
+            var source = showNormItems(normalItems[d]);
+            img.src = source;
+            imgCell.appendChild(img);
+            descrCell.innerHTML = normalItems[d];
+            descrCell.className = "descr";
+            priceCell.innerHTML = "$150";
+            priceCell.className = "price";
+            row.onclick = function(){ buyItem(this, cart, 'normal_items');};
+          }
+        }
+        var gameEvents = [];
+        function addSpecialItems(){
+          var table = document.getElementById('special_items');
+          for(var d = 0; d < specialItems.length; d++){
+            var row = table.insertRow(d);
+            row.id = specialItems[d];
+            var imgCell = row.insertCell(0);
+            var descrCell = row.insertCell(1);
+            var priceCell = row.insertCell(2);
+            var img = document.createElement('img');
+            img.className = "icon";
+            var source = showSpecItems(specialItems[d]);
+            img.src = source;
+            imgCell.appendChild(img);
+            descrCell.innerHTML = specialItems[d];
+            descrCell.className = "descr";
+            priceCell.innerHTML = "$500";
+            priceCell.className = "price";
+            row.onclick = function(){ buyItem(this, gameEvents, 'special_items');};
+          }
+        }
+        function addMaps(){
+          var table = document.getElementById('maps');
+          var newSet = getAvailableMaps(gameMaps, myMaps);
+          for(var d = 0; d < newSet.length; d++){
+            var row = table.insertRow(d);
+            row.id = newSet[d];
+            var imgCell = row.insertCell(0);
+            var descrCell = row.insertCell(1);
+            var priceCell = row.insertCell(2);
+            var img = document.createElement('img');
+            img.className = "icon";
+            img.src = "puzzles/maps/map_b.png";
+            imgCell.appendChild(img);
+            descrCell.innerHTML = newSet[d].combo + " Map";
+            descrCell.className = "descr"
+            priceCell.innerHTML = "$250";
+            priceCell.className = "price";
+            row.onclick = function(){ buyItem(this, myMaps, 'maps');};
+          }
+        }
+        
+        function showNormItems(item){
+          if(item == "Bomb")
+            return "items/ICE_arm1_red.png";
+          else if(item == "Water Bucket")
+            return "items/items2/Bucket_Water.png";
+          else if(item == "Spoon")
+            return "items/spoon.png";
+          else if(item == "Radioactive Waste")
+            return "items/Radioactive bucket.png";
+          else
+            return "";
+        }
+        function showSpecItems(item){
+          if(item == "Life Saver")
+            return "items/items2/Coin_Gold.png";
+          else if(item == "Money Multiplier")
+            return "items/items2/Coin_Silver.png";
+          else
+            return "";
+        }
+        function getInventSpace(){
+          var count = 0;
+          for(var e = 0; e < gameInventory.length;e++){
+            if(gameInventory[e] == "--")
+              count++;
+          }
+          return count;
+        }
+        function getAvailable(list, myList){
+          var avail = [];
+          for(var a = 0; a < list.length; a++){
+            if(!alreadyHave(myList, list[a].name))
+              avail.push(list[a]);
+          }
+          return avail;
+        }
+        function getAvailableMaps(list, myList){
+          var avail = [];
+          for(var a = 0; a < list.length; a++){
+            if(!alreadyHave(myList, list[a].letter))
+              avail.push(list[a]);
+          }
+          return avail;
+        }
+        function alreadyHave(list, item){
+          for(var c = 0; c< list.length; c++){
+            if(item == list[c])
+              return true;
+          }
+          return false;
+        }
+        
+        function getItemByScreenName(item){
+          for(var t = 0; t < gameHats.length; t++){     //check hats
+            if(gameHats[t].screenName == item){
+              return gameHats[t];
+            }
+          }
+          for(var t = 0; t < gameSkins.length; t++){     //check skins
+            if(gameSkins[t].screenName == item){
+              return gameSkins[t];
+            }
+          }
+        }
+        function getComboLetter(combo){
+          if(combo == "A,B,C")
+            return "A";
+          if(combo == "A,B,D")
+            return "M";
+          if(combo == "A,B,E")
+            return "C";
+          if(combo == "A,C,D")
+            return "D";
+          if(combo == "A,C,E")
+            return "E";
+          if(combo == "A,D,E")
+            return "F";
+          if(combo == "B,C,D")
+            return "L";
+          if(combo == "B,C,E")
+            return "H";
+          if(combo == "B,D,E")
+            return "I";
+          if(combo == "C,D,E")
+            return "J";
+        }
+        function start(){
+          load();
+          addHats();
+          addSkins();
+          addNormalItems();
+          addSpecialItems();
+          addMaps();
+        }
+        function getOpenInvent(){
+          for(var d = 0; d < gameInventory.length; d++){
+            if(gameInventory[d] == "--")
+              return d;
+          }
+          return 3;
+        }
+        function buyItem(row, myList, table){
+          var item;
+          if(myList != cart && myList != gameEvents && myList != myMaps)
+            item = getItemByScreenName(row.cells[1].innerHTML);
+          else if(myList == myMaps)
+            item = getComboLetter(row.cells[1].innerHTML.substr(0,5));
+            
+          var itemLabel = row.cells[1].innerHTML;
+          var price = row.cells[2].innerHTML;
+          var r = window.confirm("Do you want to buy the " + itemLabel + " for " + price);
+          var numPrice = parseInt(price.substr(1));
+          
+          var openSpot = getOpenInvent();
+          
+          if(numPrice > money){
+            alert("You can't afford to buy the " + itemLabel);
+          }else if(myList == cart && cartMax == 0){
+            alert("Not enough space in inventory!");
+          }else if(r && numPrice <= money){
+            alert(itemLabel + " get!");
+            money -= numPrice;
+            localStorage.myCash -= numPrice;
+            localStorage.setCash -= numPrice;
+            
+            if(myList == cart){
+              cartMax-= 1;
+              if(itemLabel == "Bomb")
+                myList.push("bomb");
+              else if(itemLabel == "Water Bucket")
+                myList.push("puddle");
+              else if(itemLabel == "Radioactive Waste")
+                myList.push("radiowaste");
+              else if(itemLabel == "Spoon")
+                myList.push("spoon");
+            }else if(myList == gameEvents){
+              if(itemLabel == "Life Saver"){
+                lives++;
+              }else if(itemLabel == "Money Multiplier"){
+                var moneyMult = parseInt(localStorage.moneyMult);
+                moneyMult += 1;
+                localStorage.moneyMult = moneyMult;
+              }
+            }else if(myList == myMaps){
+              myList.push(item);
+              document.getElementById(table).deleteRow(row.rowIndex);
+            }else{
+              myList.push(item.name);
+              document.getElementById(table).deleteRow(row.rowIndex);
+            }
+            
+            
+            if(myList == myHats)
+              localStorage["myHats"] = JSON.stringify(myHats);
+            else if(myList == mySkins)
+              localStorage["mySkins"] = JSON.stringify(mySkins);
+            else if(myList == cart)
+              localStorage["cart"] = JSON.stringify(cart);
+            else if(myList == myMaps)
+              localStorage["myMaps"] = JSON.stringify(myMaps);
+          }
+        }
+        function main(){
+          document.getElementById('money').innerHTML = "Money: $" + money;
+          localStorage.inStore = "true";
+          requestAnimationFrame(main);
+          localStorage.lives = Number(lives)
+        }
+        main();
+      </script>
+    </center>
+  </body>
+</html>

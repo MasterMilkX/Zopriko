@@ -1,0 +1,175 @@
+<html>
+  <head>
+    <title>Puzzle Test</title>
+    <style>
+      #dpad{
+        width: 20px;
+        height 20px;
+      }
+    </style>
+  </head>
+  <body>
+    <center>
+      <h1>Puzzle Test</h1>
+      <canvas id="game" style="border:1px solid black">
+        Cannot show canvas on this browser. Use Chrome you n00b!
+      </canvas>
+      <br>
+      <button onclick="goDir('up')">UP</button>
+      <button onclick="goDir('down')">DOWN</button>
+      <button onclick="goDir('left')">LEFT</button>
+      <button onclick="goDir('right')">RIGHT</button>
+    </center>
+    <script>
+      var canvas = document.getElementById("game");
+      var ctx = canvas.getContext("2d");
+      canvas.width = 224;
+      canvas.height = 224;
+      
+      //background image
+      var bgReady = false;
+      var bgImage = new Image();
+      bgImage.onload = function(){ bgReady = true; };
+      bgImage.src = "bg2.png";
+      
+      //wall objects
+      var wallReady = false;
+      var wallPNG = new Image();
+      wallPNG.onload = function(){wallReady = true;};
+      wallPNG.src = "wall.png";
+      
+      //floor objects
+      var floorReady = false;
+      var floorPNG = new Image();
+      floorPNG.onload = function(){floorReady = true;};
+      floorPNG.src = "mapFloor.png";
+      
+      //floor objects
+      var fillReady = false;
+      var fillPNG = new Image();
+      fillPNG.onload = function(){fillReady = true;};
+      fillPNG.src = "mapFill.png";
+      
+      //game objects
+      var player = {
+        x : 0, 
+        y : 0
+      };
+      var playerReady = false;
+      var playerPNG = new Image();
+      playerPNG.onload = function(){playerReady = true;};
+      playerPNG.src = "player.png";
+      
+      
+      var puzzle = [[0,0], [0,1], [0,2], [0,3]];
+      
+      var steps = [[player.x, player.y]];
+      
+      
+      var map = [[1,1,1,1,1,1,1,1,1,1],
+                 [1,0,0,0,0,0,0,0,0,1],
+                 [1,0,0,0,0,0,0,0,0,1],
+                 [1,0,0,0,0,0,0,0,0,1],
+                 [1,0,0,0,0,0,0,0,0,1],
+                 [1,0,0,0,0,0,0,0,0,1],
+                 [1,0,0,0,0,0,0,0,0,1],
+                 [1,0,0,0,0,0,0,0,0,1],
+                 [1,0,0,0,0,0,0,0,0,1],
+                 [1,1,1,1,1,1,1,1,1,1]];
+                 
+      var map2 = [[0,0,0,0,0,0,0,0,0,0],
+                 [0,0,0,0,0,0,0,0,0,0],
+                 [0,0,0,0,0,0,0,0,0,0],
+                 [0,0,0,0,0,0,0,0,0,0],
+                 [0,0,0,0,0,0,0,0,0,0],
+                 [0,0,0,0,0,0,0,0,0,0],
+                 [0,0,0,0,0,0,0,0,0,0],
+                 [0,0,0,0,0,0,0,0,0,0],
+                 [0,0,0,0,0,0,0,0,0,0],
+                 [0,0,0,0,0,0,0,0,0,0],
+                 [0,0,0,0,0,0,0,0,0,0]];
+                 
+      var curMap = map2;
+      
+      function drawMap(){
+        for(var z = 0; z < curMap.length; z++){
+          for(var y = 0; y < curMap[z].length; y++){
+            if(curMap[z][y] == 1){
+              ctx.drawImage(wallPNG, y * 32, z * 32);
+            }else if(curMap[z][y] == 0){
+              ctx.drawImage(floorPNG, y * 32, z * 32);
+            }
+          }
+        }
+      }
+      function fillAll(){
+        for(var i = 0; i < steps.length; i++){
+          var cell = steps[i];
+          if(fillReady){
+            ctx.drawImage(fillPNG, cell[0] * 32, cell[1] * 32);
+          }
+        }
+      }
+      
+      function render(){
+        if(wallReady && floorReady){
+          drawMap();
+        }
+        fillAll();
+        if(playerReady){
+          ctx.drawImage(playerPNG, player.x * 32, player.y * 32);
+        }
+      }
+      
+      function main(){
+        requestAnimationFrame(main);
+        render();
+        checkPath();
+      }
+      
+      function checkPath(){
+        //console.log(steps[steps.length - 1])
+        if(!onPath(steps[steps.length - 1])){
+          alert("WRONG STEP! YOU LOSE!");
+          player.x = steps[0][0];
+          player.y = steps[0][1];
+          window.close();
+        }else if((player.x == puzzle[puzzle.length - 1][0]) && (player.y == puzzle[puzzle.length - 1][1])){
+          alert("YOU WIN!");
+          player.x = steps[0][0];
+          player.y = steps[0][1];
+          window.close();
+        }
+      }
+      function arrEq(arr1, arr2){
+        for(var p = 0; p < arr1.length; p++){
+          if(arr1[p] !== arr2[p])
+            return false
+        }
+        return true;
+      }
+      function onPath(point){
+        for(var c = 0; c < puzzle.length; c++){
+          if(arrEq(puzzle[c], point)){
+            return true;
+          }
+        }
+        return false;
+      }
+      function goDir(dir){
+        if(dir == "up"){
+          player.y -= 1;
+        }else if(dir == "down"){
+          player.y += 1;
+        }else if(dir == "left"){
+          player.x -= 1;
+        }else if(dir == "right"){
+          player.x += 1;
+        }
+        steps.push([player.x, player.y]);
+      }
+      
+      main();
+    </script>
+  </body>
+</html>

@@ -1,0 +1,13 @@
+Features to Add
+=================
+*Bank
+*GameOver Screen
+*Casino
+*More skins and hats
+*Spoon + Doppelganger
+*Pacman enemies
+-Make the pop-up screens side screens
+-Make items available on the black market
+-Fix grey out for the black market
+-Puzzle story mode
+-Smart phone usability / app

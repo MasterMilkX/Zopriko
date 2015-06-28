@@ -1,0 +1,102 @@
+<html>
+  <head>
+    <title>
+      Casino
+    </title>
+    <style>
+      #machine{
+        width: 40vh;
+        height:auto;
+      }
+      #money{
+        color:#03A100;
+      }
+    </style>
+  </head>
+  <body>
+    <center>
+      <h2>Casino</h2>
+      <h3 id="money">Money: $</h3>
+      <img src="items/items3/Slot_Mascheen_norm.png" id="machine"><br>
+      <h2 id="status">&nbsp;</h2>
+        Bet: <input type="number" min="1" max="1000000" id="bet" value="5">
+        <button onclick="bet();">Pull the lever, Kronk!</button>
+    </center>
+    <script>
+      var money = 0;
+      var result;
+      var amt;
+      var pulled = false;
+      var showStatus;
+      function load(){
+        if(typeof(Storage) !== "undefined"){
+          if(localStorage.setCash)
+            money = Number(localStorage.setCash);
+          else{
+            money = 0;
+            localStorage.setCash = Number(money);
+          }
+            
+        }
+      }
+      function bet(){
+        document.getElementById('bet').readonly = true;
+        document.getElementById('machine').src = "items/items3/Slot_Mascheen_norm.png";
+        document.getElementById('status').innerHTML = "&nbsp";
+        amt = Math.floor(document.getElementById('bet').value);
+        if(amt == null || amt == "" || amt % 1 !== 0 || isNaN(amt)){
+          alert("Input a real number!");
+        }else if(amt < 0){
+          alert("No negative moneys!")
+        }else if(amt > money){
+          alert("Can't bet what you don't have!");
+        }else if(money == 0){
+          alert("Dude you're broke! Stop playing!")
+        }
+        else if(pulled == false){
+          clearTimeout(showStatus);
+          pulled = true;
+          showStatus = setTimeout(setStatus, 1500);
+          var dice = Math.floor(Math.random() * 5) + 1;
+          if(dice == 5){
+            result = "win";
+          }else{
+            result = "lose";
+          }
+          
+          if(result == "lose"){
+            var slotDice = Math.floor(Math.random() * 7) + 1;
+            document.getElementById('machine').src = "items/items3/Slot_Mascheen_lose" + slotDice + ".gif";
+          }else{
+            document.getElementById('machine').src = "items/items3/Slot_Mascheen_win.gif";
+          }
+        }
+        
+      }
+      function setStatus(){
+        if(result == "lose"){
+          document.getElementById('status').innerHTML = "LOSE";
+          document.getElementById('status').style.color = "#ff0000";
+          money -= parseInt(amt);
+          localStorage.myCash -= parseInt(amt);
+        }else if(result == "win"){
+          money += parseInt(amt * 5);
+          localStorage.myCash = parseInt(money);
+          document.getElementById('status').innerHTML = 'WIN';
+          document.getElementById('status').style.color = "#1FFF00";
+        }
+        pulled = false;
+      }
+      
+      load();
+      function main(){
+        requestAnimationFrame(main);
+        document.getElementById('bet').max = money;
+        document.getElementById('money').innerHTML = "Money: $" + money;
+        localStorage.setCash = money;
+        console.log(pulled);
+      }
+      main();
+    </script>
+  </body>
+</html>

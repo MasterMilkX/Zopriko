@@ -1,0 +1,228 @@
+<html>
+  <head>
+    <title>
+      Puzzle Key Room
+    </title>
+    <style>
+      body{
+        background-color:#B97C3B;
+      }
+      .artifactIMG{
+        width:20vh;
+        height:20vh;
+      }
+      select, option{
+        width: 20vh;
+      }
+      button{
+        width:30vh;
+        height:10vh;
+        background-color:#ffcc00;
+        font-weight:bold;
+      }
+    </style>
+  </head>
+  <body onload="start();">
+    <center>
+      <h1>
+        Key Room
+      </h1>
+      <h4>
+        Place the artifact combination below to unlock the Puzzle Room
+      </h4>
+      <table>
+        <tr>
+          <td>
+            <img class="artifactIMG" id="art1IMG" src="puzzles/artifacts/--.png">
+          </td>
+          <td>
+            <img class="artifactIMG" id="art2IMG" src="puzzles/artifacts/--.png">
+          </td>
+          <td>
+            <img class="artifactIMG" id="art3IMG" src="puzzles/artifacts/--.png">
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <select id="art1" class="artifact">
+              <option value="--">--</option>
+            </select>
+          </td>
+          <td>
+            <select id="art2" class="artifact">
+              <option value="--">--</option>
+            </select>
+          </td>
+          <td>
+            <select id="art3" class="artifact">
+              <option value="--">--</option>
+            </select>
+          </td>
+        </tr>
+        <tr>
+          <td>&nbsp;</td>
+        </tr>
+        <tr>
+          <td style="text-align:center" colspan="3"><button onclick="goToPuzzle();">Get Treasure</button></td>
+        </tr>
+      </table>
+    </center>
+    <script>
+      var artifacts = [];
+      var maxWindow;
+      function load(){
+        if(localStorage["artifacts"])
+          artifacts = JSON.parse(localStorage["artifacts"]);
+        else
+          artifacts = [];
+      }
+      function getArtifacts(){
+        for(var c = 1; c <= 3;c++){
+          for(var a = 0; a < artifacts.length; a++){
+            var opt = document.createElement('option');
+            opt.value = artifacts[a];
+            opt.innerHTML = artifacts[a];
+            document.getElementById('art' + c).appendChild(opt);
+          }
+        }
+      }
+      function start(){
+        load();
+        getArtifacts();
+      }
+      
+      function goToPuzzle(){
+        var art1 = document.getElementById('art1').value;
+        var art2 = document.getElementById('art2').value;
+        var art3 = document.getElementById('art3').value;
+        
+        if((art1 !== art2 && art2 !== art3 && art1 !== art3) && (art1 !== "--" && art2 !== "--" && art3 !== "--")){
+          setPuzzle(art1, art2, art3);
+          alert("Puzzle Pieces Successfully Placed!\nEntering the Puzzle Room");
+          openWindow("puzzleRoom.html", 400, 400);
+          //window.close();
+        }else{
+          alert("Puzzle Pieces not placed correctly! Try again!");
+        }
+      }
+      function setPuzzle(a1, a2, a3){
+        var artSet = [a1, a2, a3];
+        var combo = getPuzzleCombo(artSet);
+        if(combo == 1){         //MAP A
+          var puzzle = [[0,0], [1,0], [2,0], [3,0], [4,0], [5,0], [6,0], [6,1], [5,1], [4,1], [3,1], [2,1], [1,1], [0,1], [0,2], [1,2], [2,2], [3,2], [4,2], [5,2], [6,2], [6,3], [5,3], [4,3], [3,3], [2,3], [1,3], [0,3], [0,4], [0,5], [1,5], [2,5], [3,5], [4,5], [5,5], [6,5], [6,6], [5,6], [4,6], [3,6], [2,6], [1,6], [0,6]];
+          localStorage["puzzle"] = JSON.stringify(puzzle);
+          var startPos = [0,0]
+          localStorage["startPos"] = JSON.stringify(startPos);
+          localStorage.combo = 'a';
+        }else if(combo == 2){   //MAP M
+          var puzzle = [[0,0], [1,0], [2,0], [2,2], [2,1], [2,4], [1,3], [2,3], [0,3], [0,4], [0,5], [1,5], [2,5], [3,5], [4,5], [5,5], [5,4], [5,3], [4,3], [4,2], [5,2], [6,2], [6,3], [6,4], [6,5], [6,6]];
+          localStorage["puzzle"] = JSON.stringify(puzzle);
+          var startPos = [0,0]
+          localStorage["startPos"] = JSON.stringify(startPos);
+          localStorage.combo = 'm';
+        }else if(combo == 3){   //MAP C
+          var puzzle = [[1,6], [1,5], [1,4], [2,4], [3,4], [3,3], [3,2], [3,1], [4,1], [4,2], [4,3], [4,4], [5,4], [6,4], [6,5], [6,6]];
+          localStorage["puzzle"] = JSON.stringify(puzzle);
+          var startPos = [1,6]
+          localStorage["startPos"] = JSON.stringify(startPos);
+          localStorage.combo = 'c';
+        }else if(combo == 4){   //MAP D
+          var puzzle = [[0,0], [1,0], [1,1], [2,1], [2,2], [3,2], [3,3], [4,3], [5,3], [6,3], [6,4], [6,5], [6,6], [5,6], [4,6], [4,5], [3,5], [2,5], [2,4], [1,4], [1,3], [0,3], [0,2]];
+          localStorage["puzzle"] = JSON.stringify(puzzle);
+          var startPos = [0,0]
+          localStorage["startPos"] = JSON.stringify(startPos);
+          localStorage.combo = 'd';
+        }else if(combo == 5){   //MAP E
+          var puzzle = [[0,0], [0,1], [0,2], [1,2], [2,2], [2,1], [2,0], [1,0], [3,1], [4,1], [4,3], [2,3], [3,3], [5,3], [5,2], [5,1], [1,5], [1,4], [2,4], [2,5], [2,5], [1,6], [2,6], [5,4], [5,5], [6,5], [6,4], [6,3]];
+          localStorage["puzzle"] = JSON.stringify(puzzle);
+          var startPos = [0,0]
+          localStorage["startPos"] = JSON.stringify(startPos);
+          localStorage.combo = 'e';
+        }else if(combo == 6){   //MAP F
+          var puzzle = [[2,6], [3,6], [4,6], [4,5], [5,5], [6,5], [6,4], [6,3], [5,3], [4,3], [3,3], [2,3], [2,4], [1,4], [0,4], [0,3], [0,2], [0,1], [0,0], [1,0], [2,0], [3,0], [3,1], [4,1], [5,1], [5,0]];
+          localStorage["puzzle"] = JSON.stringify(puzzle);
+          var startPos = [5,0]
+          localStorage["startPos"] = JSON.stringify(startPos);
+          localStorage.combo = 'f';
+        }else if(combo == 7){   //MAP L
+          var puzzle = [[3,3], [4,3], [3,2], [2,1], [3,1], [4,4], [5,4], [6,4], [6,5], [6,6], [5,6], [4,6], [3,6], [2,6], [1,6], [0,6], [0,5]];
+          localStorage["puzzle"] = JSON.stringify(puzzle);
+          var startPos = [2,1]
+          localStorage["startPos"] = JSON.stringify(startPos);
+          localStorage.combo = 'l';
+        }else if(combo == 8){   //MAP H
+          var puzzle = [[1,0], [1,1], [1,2], [2,2], [3,2], [3,1], [3,0], [4,0], [4,1], [4,2], [4,3], [4,4], [3,4], [1,4], [2,4], [1,5], [1,6], [2,6], [2,5], [3,5], [3,6], [4,6], [5,6], [5,5], [5,4], [5,3], [6,3]];
+          localStorage["puzzle"] = JSON.stringify(puzzle);
+          var startPos = [1,0]
+          localStorage["startPos"] = JSON.stringify(startPos);
+          localStorage.combo = 'h';
+        }else if(combo == 9){   //MAP I
+          var puzzle = [[2,2], [1,2], [1,3], [1,4], [1,5], [2,5], [3,5], [3,4], [4,4], [5,4], [5,3], [5,2], [6,2], [6,0], [6,1], [5,0], [4,0], [4,1], [3,1], [3,2]];
+          localStorage["puzzle"] = JSON.stringify(puzzle);
+          var startPos = [2,2]
+          localStorage["startPos"] = JSON.stringify(startPos);
+          localStorage.combo = 'i';
+        }else if(combo == 10){  //MAP J
+          var puzzle = [[0,6], [0,5], [1,5], [2,5], [3,5], [4,5], [5,5], [5,4], [5,3], [5,2], [5,1], [4,2], [4,1], [3,2], [2,2], [2,1], [2,0], [1,0], [0,0], [0,1], [0,2], [0,3], [1,3]];
+          localStorage["puzzle"] = JSON.stringify(puzzle);
+          var startPos = [1,3]
+          localStorage["startPos"] = JSON.stringify(startPos);
+          localStorage.combo = 'j';
+        }
+        localStorage["artSet"] = JSON.stringify(artSet);
+      }
+      var combos = [["A", "B", "C"], ["A", "B", "D"], ["A", "B", "E"], ["A", "C", "D"],["A", "C", "E"],["A", "D", "E"],["B", "C", "D"],["B", "C", "E"], ["B", "D", "E"],["C", "D", "E"]]
+      function getPuzzleCombo(arts){
+        arts.sort();
+        for(var b = 0; b < combos.length; b++){
+          if(arrEq(combos[b], arts))
+            return b + 1;
+        }
+      }
+      function arrEq(arr1, arr2){
+        if(!Array.isArray(arr1))
+          return false; 
+          
+        for(var p = 0; p < arr1.length; p++){
+          if(arr1[p] !== arr2[p])
+            return false
+        }
+        return true;
+      }
+      function inArr(art, combo){
+        for(var a = 0; a < combo.length; a++){
+          if(art == combo[a])
+            return true;
+        }
+        return false;
+      }
+      
+      function openWindow(url, width, height){
+        if(maxWindow && !maxWindow.closed){
+          maxWindow.close();
+        }
+        var winWidth = width;
+        var winHeight = height;
+        var winLeft = (screen.width-winWidth)/2;
+        var winTop = (screen.height - winHeight)/2;
+        var winOptions = ",width=" + winWidth;
+        winOptions += ",height=" + winHeight;
+        winOptions += ",left=" + winLeft;
+        winOptions += ",top=" + winTop;
+        winOptions += ",menubar=no,location=no,resizable=no,scrollbars=no, toolbar=no"
+        maxWindow = window.open(url, "newWindow", winOptions);
+        moveKey = null;
+      }
+      function main(){
+        showArtifacts();
+        requestAnimationFrame(main)
+      }
+      main();
+      function showArtifacts(){
+        document.getElementById('art1IMG').src = "puzzles/artifacts/" + document.getElementById('art1').value + ".png";
+        document.getElementById('art2IMG').src = "puzzles/artifacts/" + document.getElementById('art2').value + ".png";
+        document.getElementById('art3IMG').src = "puzzles/artifacts/" + document.getElementById('art3').value + ".png";
+      }
+    </script>
+  </body>
+</html>

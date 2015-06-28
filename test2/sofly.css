@@ -1,0 +1,17 @@
+#container{
+  text-align:center;
+}
+#controls{
+  background-color:#0000ff;
+  width:50vh;
+  height: 50vh;
+}
+#buttons{
+  background-color:#00ff00;
+  width:50vh;
+  height: 50vh;
+}
+body{
+  -webkit-user-select: none;
+  -webkit-tap-highlight-color: rgba(0,0,0,0);
+}

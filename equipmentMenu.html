@@ -1,0 +1,152 @@
+<html>
+  <head>
+    <title>Equipment Menu</title>
+    <style>
+      #avatar{
+        border:1px solid blue;
+      }
+    </style>
+  </head>
+  <body onload="start();">
+      <center>
+        <h2>Equipment</h2>
+        <canvas id="avatar" width="150" height="150">
+          Canvas cannot be rendered
+        </canvas>
+        <br>
+        <select id="hatSelect" onchange="requipHat(this.value)">
+          <option value="None">None</option>
+        </select>
+        <select id="skinSelect" onchange="requipSkin(this.value)">
+          <option value="Default">Default</option>
+        </select>
+      </center>
+    <script src="customizables.js"></script>
+    <script>
+      var hats = [];
+      var skins = [];
+      var curHat = "None";
+      var curSkin = "Default";
+      
+      var canvas = document.getElementById('avatar')
+      var ctx = canvas.getContext('2d');
+      var avatarPNG = new Image();
+      var avatarReady = false;
+      avatarPNG.onload = function(){avatarReady = true;};
+      avatarPNG.src = "entities/player.png";
+      var hatPNG = new Image();
+      var hatReady = false;
+      hatPNG.onload = function(){hatReady = true;};
+      hatPNG.src = "items/hats/none.png";
+      
+      function load(){
+        if(typeof(Storage) !== "undefined"){
+          if(localStorage["myHats"])
+            hats = JSON.parse(localStorage["myHats"]);
+          else
+            hats = [];
+          
+          if(localStorage.myHat)
+            curHat = localStorage.myHat;
+          else{
+            localStorage.myHat = "None";
+            curHat = "None";
+          }
+            
+            
+          if(localStorage["mySkins"])
+            skins = JSON.parse(localStorage["mySkins"]);
+          else
+            skins = [];
+          
+          if(localStorage.mySkin)
+            curSkin = localStorage.mySkin;
+          else{
+            localStorage.mySkin = "Default";
+            curSkin = "Default";
+          }
+        }
+      }
+      load();
+      function getHats(){
+        for(var a = 0; a < hats.length; a++){
+          var opt = document.createElement('option');
+          opt.value = hats[a];
+          opt.innerHTML = hats[a];
+          document.getElementById('hatSelect').appendChild(opt);
+        }
+      }
+      function getSkins(){
+        for(var a = 0; a < skins.length; a++){
+          var opt = document.createElement('option');
+          opt.value = skins[a];
+          opt.innerHTML = skins[a];
+          document.getElementById('skinSelect').appendChild(opt);
+        }
+      }
+      function start(){
+        load();
+        getSkins();
+        getHats();
+        console.log('loaded');
+        document.getElementById('skinSelect').value = curSkin;
+        document.getElementById('hatSelect').value = curHat;
+      }
+      function render(){
+        ctx.fillStyle = "#ffffff";
+        ctx.fillRect(0,0,canvas.width,canvas.height)
+        if(avatarReady)
+          ctx.drawImage(avatarPNG, 0, 0, 150, avatarPNG.height * (150/avatarPNG.width));
+        if(hatReady) 
+          ctx.drawImage(hatPNG, 0, -getItemByName(curHat).dispY * (150/hatPNG.width),  150, hatPNG.height * (150/hatPNG.width))
+      }
+      function getItemByName(item){
+        for(var t = 0; t < gameHats.length; t++){     //check hats
+          if(gameHats[t].name == item){
+            return gameHats[t];
+          }
+        }
+      }
+      function init(){
+        requipHat(curHat);
+        requipSkin(curSkin);
+        requestAnimationFrame(init);
+        render();
+        localStorage.myHat = curHat;
+        localStorage.mySkin = curSkin;
+      }
+      function requipHat(value){
+        var obj = getItemByName(value);
+        hatPNG.src = obj.src;
+        
+        curHat = value;
+      }
+      function requipSkin(value){
+        var obj = getItemByName(value);
+        avatarPNG.src = obj.src;
+          
+        curSkin = value;
+      }
+      function getItemByName(item){
+        for(var t = 0; t < gameHats.length; t++){     //check hats
+          if(gameHats[t].name == item){
+            return gameHats[t];
+          }
+        }
+        for(var t = 0; t < gameSkins.length; t++){     //check skins
+          if(gameSkins[t].name == item){
+            return gameSkins[t];
+          }
+        }
+      }
+      function returnList(list){
+        var total = "";
+        for(var a = 0; a < list.length; a++){
+          total += list[a] + ", ";
+        }
+        return total;
+      }
+      init();
+    </script>
+  </body>
+</html>

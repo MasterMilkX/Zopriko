@@ -1,0 +1,22 @@
+<html>
+  <head>
+    <title>Map</title>
+    <style>
+      body{
+        background-color:#B97C3B;
+      }
+      #map{
+        width:90%;
+        height:90%;
+      }
+    </style>
+  </head>
+  <body>
+    <center>
+      <img id="map">
+    </center>
+    <script>
+      document.getElementById('map').src = "puzzles/maps/map_" + localStorage.combo + ".png";
+    </script>
+  </body>
+</html>

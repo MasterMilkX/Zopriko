@@ -1,0 +1,425 @@
+<html>
+  <head>
+    <title>Puzzle Room</title>
+    <style>
+      body{
+        background-color:#B97C3B;
+      }
+      td{
+        text-align:center;
+      }
+      .artifacts{
+        width:10vh;
+        height:10vh;
+      }
+      button{
+        width:30vh;
+        height:10vh;
+      }
+    </style>
+  </head>
+  <body onload="load()">
+    <center>
+      <h1>Puzzle Room</h1>
+      <canvas id="game" style="border:1px solid black">
+        Cannot show canvas on this browser. Use Chrome you n00b!
+      </canvas>
+      <table width="224">
+        <tr></tr>
+        <tr>
+          <td><img id="art1" class="artifacts"></td>
+          <td><img id="art2" class="artifacts"></td>
+          <td><img id="art3" class="artifacts"></td>
+        </tr>
+        <tr></tr>
+        <tr>
+          <td colspan="3"><button onclick="showMap()" id="getMap">Show Map</button></td>
+        </tr>
+      </table>
+      </center>
+    <script src="customizables.js"></script>
+    <script>
+      var canvas = document.getElementById("game");
+      var ctx = canvas.getContext("2d");
+      canvas.width = 224;
+      canvas.height = 224;
+      
+      //background image
+      var bgReady = false;
+      var bgImage = new Image();
+      bgImage.onload = function(){ bgReady = true; };
+      bgImage.src = "puzzles/bg2.png";
+      
+      //floor objects
+      var floorReady = false;
+      var floorPNG = new Image();
+      floorPNG.onload = function(){floorReady = true;};
+      floorPNG.src = "puzzles/mapFloor.png";
+      
+      //floor objects
+      var fillReady = false;
+      var fillPNG = new Image();
+      fillPNG.onload = function(){fillReady = true;};
+      fillPNG.src = "puzzles/mapFill.png";
+      
+      //game objects
+      var player = {
+        x : 0, 
+        y : 0
+      };
+      var playerReady = false;
+      var playerPNG = new Image();
+      playerPNG.onload = function(){playerReady = true;};
+      playerPNG.src = "entities/player.png";
+      
+      var hat = {
+        x : 3,
+        y : 3
+      };
+      var hatReady = false;
+      var hatPNG = new Image();
+      hatPNG.onload = function(){hatReady = true;};
+      hatPNG.src = "items/hats/none.png";
+      
+      var curHat = "items/hats/none.png";
+      var curSkin = "entities/player.png";
+      
+      var myHats = [];
+      var mySkins = [];
+      
+      var hats = []
+      var skins = []
+      var prizes = [];
+      
+      //input variables 
+      var moveKey = null;
+      var canMove = false;
+      var solving = true;
+      
+      var upKey = 38;
+      var downKey = 40;
+      var leftKey = 37;
+      var rightKey = 39;
+      
+      //puzzles and maps
+      var puzzle = [];
+      var steps = [];
+                 
+      var map2 = [[0,0,0,0,0,0,0,0,0,0],
+                 [0,0,0,0,0,0,0,0,0,0],
+                 [0,0,0,0,0,0,0,0,0,0],
+                 [0,0,0,0,0,0,0,0,0,0],
+                 [0,0,0,0,0,0,0,0,0,0],
+                 [0,0,0,0,0,0,0,0,0,0],
+                 [0,0,0,0,0,0,0,0,0,0],
+                 [0,0,0,0,0,0,0,0,0,0],
+                 [0,0,0,0,0,0,0,0,0,0],
+                 [0,0,0,0,0,0,0,0,0,0],
+                 [0,0,0,0,0,0,0,0,0,0]];
+                 
+      var curMap = map2;
+      
+      
+      function load(){
+        if(localStorage["puzzle"])
+          puzzle = JSON.parse(localStorage["puzzle"]);
+        else
+          puzzle = [[0,0], [0,1]];
+          
+        if(localStorage["startPos"]){
+          var startPos = JSON.parse(localStorage["startPos"]);
+          player.x = startPos[0];
+          player.y = startPos[1];
+          steps = [[player.x, player.y]]
+        }else{
+          player.x = 0;
+          player.y = 0;
+        }
+        
+        if(localStorage["myHats"]){
+          myHats = JSON.parse(localStorage["myHats"]);
+        }else 
+          myHats = [];
+        
+        if(localStorage["mySkins"])
+          mySkins = JSON.parse(localStorage["mySkins"]);
+        else
+          mySkins = [];
+        
+        prizeList();
+        
+        var artSet = JSON.parse(localStorage["artSet"]);
+        document.getElementById('art1').src = "puzzles/artifacts/" + artSet[0] + ".png";
+        document.getElementById('art2').src = "puzzles/artifacts/" + artSet[1] + ".png";
+        document.getElementById('art3').src = "puzzles/artifacts/" + artSet[2] + ".png";
+      }
+      
+      var counter = 0;
+      function moveType(e){
+        if(moveKey === null){
+          canMove = true;
+          move(e);
+        }
+      }
+      
+      function move(e){
+        if(canMove && solving){
+          moveKey = e.keyCode;
+          
+          if(e.keyCode == upKey){
+            player.y -= 1;
+            moveKey = upKey;
+            canMove = false;
+          }else if(e.keyCode == downKey){
+            player.y += 1;
+            moveKey = downKey;
+            canMove = false;
+          }else if(e.keyCode == leftKey){
+            player.x -= 1;
+            moveKey = leftKey;
+            canMove = false;
+          }else if(e.keyCode == rightKey){
+            player.x += 1;
+            moveKey = rightKey;
+            canMove = false;
+          }
+          steps.push([player.x, player.y]);
+        }
+      }
+      
+      function resetKey(e){
+        if(moveKey == e.keyCode){
+          moveKey = null;
+          counter = 0;
+          npcCanMove = false;
+          canMove = false;
+        }
+      }
+      
+      function drawMap(){
+        for(var z = 0; z < curMap.length; z++){
+          for(var y = 0; y < curMap[z].length; y++){
+            if(curMap[z][y] == 0){
+              ctx.drawImage(floorPNG, y * 32, z * 32);
+            }
+          }
+        }
+      }
+      
+      function fillAll(){
+        for(var i = 0; i < steps.length; i++){
+          var cell = steps[i];
+          if(fillReady){
+            ctx.drawImage(fillPNG, cell[0] * 32, cell[1] * 32);
+          }
+        }
+      }
+      function wearHat(){
+        hat.x = player.x;
+        hat.y = player.y;
+        
+        hatPNG.src = getItemByName(localStorage.myHat).src;
+      }
+      function wearSkin(){
+        playerPNG.src = getItemByName(localStorage.mySkin).src;
+      }
+      function getItemByName(item){
+        for(var t = 0; t < gameHats.length; t++){     //check hats
+          if(gameHats[t].name == item){
+            return gameHats[t];
+          }
+        }
+        for(var t = 0; t < gameSkins.length; t++){     //check skins
+          if(gameSkins[t].name == item){
+            return gameSkins[t];
+          }
+        }
+      }
+      function render(){
+        if(floorReady){
+          drawMap();
+        }
+        fillAll();
+        if(playerReady){
+          ctx.drawImage(playerPNG, player.x * 32, player.y * 32);
+        }
+        if(hatReady){
+          ctx.drawImage(hatPNG, hat.x * 32, (hat.y * 32) - getItemByName(localStorage.myHat).dispY);
+        }
+      }
+      
+      function main(){
+        requestAnimationFrame(main);
+        render();
+        window.addEventListener("keydown", moveType, false);
+        window.addEventListener("keyup", resetKey, false);
+        wearHat();
+        wearSkin();
+        checkPath();
+        
+        /*if(!solving){
+          window.close();
+          mapWin.close();
+        }*/
+        if(inArr(localStorage.combo.toUpperCase(), localStorage["myMaps"])){
+          document.getElementById("getMap").disabled = false;
+        }else{
+          document.getElementById("getMap").disabled = true;
+        }
+        
+      }
+      function inArr(item, list){
+        for(var e = 0; e < list.length; e++){
+          if(list[e] == item)
+            return true;
+        }
+        return false;
+      }
+      function checkPath(){
+        //console.log(steps[steps.length - 1])
+        if(!onPath(steps[steps.length - 1])){
+          player.x = steps[0][0];
+          player.y = steps[0][1];
+          steps = [[player.x, player.y]];
+          
+          alert("WRONG STEP! YOU LOSE!");
+          mapWin.close();
+          window.close();
+          //location.reload();
+          
+        }else if(allSteps() && solving){
+          
+          //console.log("YOU WIN!");
+          var prize = givePrize();
+          if(!hasPrize(prize)){
+            alert("You win a " + prize.screenName);
+            if(getSet(prize) == hats)
+              myHats.push(prize.name);
+            else if(getSet(prize) == skins)
+              mySkins.push(prize.name);
+            else{
+              alert("You win $500!");
+              var cash = Number(localStorage.myCash);
+              cash += 500;
+              localStorage.myCash = cash;
+            }
+          }else{
+            alert("You win $500!");
+            var cash = Number(localStorage.myCash);
+            cash += 500;
+            localStorage.myCash = cash;
+          }
+          localStorage["myHats"] = JSON.stringify(myHats);
+          localStorage["mySkins"] = JSON.stringify(mySkins);
+          solving = false;
+            
+          //location.reload();
+          //window.close();
+        }
+      }
+      function getSet(item){
+        for(var v = 0; v<hats.length; v++){
+          if(item == hats[v])
+            return hats;
+        }
+        for(var v = 0; v<skins.length; v++){
+          if(item == skins[v])
+            return skin;
+        }
+      }
+      function givePrize(){
+        var combo = localStorage.combo;
+        var comboLet = ["a", "m", "c", "d", "e", "f", "l", "h", "i", "j"];
+        var index = comboLet.indexOf(combo);
+        return prizes[index];
+      }
+      function hasPrize(item){
+        for(var c = 0; c < myHats.length; c++){
+          if(myHats[c] == item.name)
+            return true;
+        }
+        for(var c = 0; c < mySkins.length; c++){
+          if(mySkins[c] == item.name)
+            return true;
+        }
+        return false;
+      }
+      function prizeList(){
+        for(var a = 0; a < gameHats.length; a++){
+          if(gameHats[a].price == 0){
+            hats.push(gameHats[a]);
+            prizes.push(gameHats[a]);
+          }
+        }
+        for(var b =0; b< gameSkins.length;b++){
+          if(gameSkins[b].price == 0) {
+            skins.push(gameSkins[b]);
+            prizes.push(gameSkins[b]);
+            
+          }
+        }
+      }
+      function allSteps(){
+        for(var b = 0; b < puzzle.length; b++){
+          if(!inSteps(puzzle[b]))
+            return false;
+        }
+        return true;
+      }
+      function inSteps(step){
+        for(var a = 0; a < steps.length; a++){
+          if(arrEq(steps[a], step))
+            return true;
+        }
+        return false;
+      }
+      
+      function arrEq(arr1, arr2){
+        for(var p = 0; p < arr1.length; p++){
+          if(arr1[p] !== arr2[p])
+            return false
+        }
+        return true;
+      }
+      function onPath(point){
+        for(var c = 0; c < puzzle.length; c++){
+          if(arrEq(puzzle[c], point)){
+            return true;
+          }
+        }
+        return false;
+      }
+      function goDir(dir){
+        if(dir == "up"){
+          player.y -= 1;
+        }else if(dir == "down"){
+          player.y += 1;
+        }else if(dir == "left"){
+          player.x -= 1;
+        }else if(dir == "right"){
+          player.x += 1;
+        }
+        steps.push([player.x, player.y]);
+      }
+      function showMap(){
+        openWindow("mapWindow.html", 350, 350);
+      }
+      var mapWin;
+      function openWindow(url, width, height){
+        var winWidth = width;
+        var winHeight = height;
+        var winLeft = (screen.width-winWidth)/2;
+        var winTop = (screen.height - winHeight)/2;
+        var winOptions = ",width=" + winWidth;
+        winOptions += ",height=" + winHeight;
+        winOptions += ",left=" + winLeft;
+        winOptions += ",top=" + winTop;
+        winOptions += ",menubar=no,location=no,resizable=no,scrollbars=no, toolbar=no"
+        mapWin = window.open(url, "_blank", winOptions);
+        moveKey = null;
+      }
+      
+      main();
+    </script>
+  </body>
+</html>
