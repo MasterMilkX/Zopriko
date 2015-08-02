@@ -201,7 +201,7 @@ var breadCat = {
 var catReady = false;
 var catPNG = new Image();
 catPNG.onload = function(){catReady = true;};
-catPNG.src = "items/items4/bread_cat/front2.png";
+catPNG.src = "items/items4/bread_cat/Front2.png";
 var playerPosCat = [player.x, player.y];
 
 //input variables 
