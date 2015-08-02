@@ -46,7 +46,7 @@ var gameSkins = [
     new item("Purple Skin", 350, "entities/purple.png", "Purple Skin",0),
     new item("Red Skin", 350, "entities/red.png", "Red Skin",0),
     new item("White Skin", 350, "entities/white.png", "White Skin",0),
-    new item("Player Skin", 1, "entities/player.png", "Default")
+    new item("Player Skin", 1, "entities/player.png", "Default Skin")
 ];
 
 
