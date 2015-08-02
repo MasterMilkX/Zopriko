@@ -126,7 +126,7 @@ var hole = {
 var holeReady = false;
 var holePNG = new Image();
 holePNG.onload = function(){holeReady = true;};
-holePNG.src = "items/stair.png";
+holePNG.src = "items/Stair.png";
 
 var blackMarket = {
   x : 0,
@@ -201,7 +201,7 @@ var breadCat = {
 var catReady = false;
 var catPNG = new Image();
 catPNG.onload = function(){catReady = true;};
-catPNG.src = "items/items4/bread cat/front2.png";
+catPNG.src = "items/items4/bread_cat/front2.png";
 var playerPosCat = [player.x, player.y];
 
 //input variables 
@@ -1436,7 +1436,7 @@ function item(x, y, name){
   else if(name == "puddle")
     this.itemPNG.src = "items/items2/Bucket_Water.png";
   else if(name == "radiowaste")
-    this.itemPNG.src = "items/Radioactive Bucket.png";
+    this.itemPNG.src = "items/Radioactive_Bucket.png";
   else if(name == "spoon")
     this.itemPNG.src = "items/spoon.png";
   else
