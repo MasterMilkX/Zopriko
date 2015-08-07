@@ -1436,7 +1436,7 @@ function item(x, y, name){
   else if(name == "puddle")
     this.itemPNG.src = "items/items2/Bucket_Water.png";
   else if(name == "radiowaste")
-    this.itemPNG.src = "items/Radioactive_Bucket.png";
+    this.itemPNG.src = "items/Radioactive.png";
   else if(name == "spoon")
     this.itemPNG.src = "items/spoon.png";
   else
